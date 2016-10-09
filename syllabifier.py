@@ -6,42 +6,51 @@ from nltk.corpus import cmudict
 arpabet = cmudict.dict()
 
 def is_vowel(token):
+	"""Tests whether a given Arpabet token is a vowel or not."""
 	if re.sub('(0|1|2)', '', token) in a.VOWELS:
 		return True
 	else:
 		return False
 
 def is_consonant(token):
+	"""Tests whether a given Arpabet token is a consonant or not."""
 	if not(re.sub('(0|1|2)', '', token) in a.VOWELS):
 		return True
 	else:
 		return False
 
 def is_long_vowel(token):
+	"""Tests whether a given Arpabet token is a long vowel (like the o in most) or not."""
 	if re.sub('(0|1|2)', '', token) in a.LONG_VOWELS:
 		return True
 	else:
 		return False
 
 def is_short_vowel(token):
+	"""Tests whether a given Arpabet token is a short vowel (like the oo in book) or not."""
 	if re.sub('(0|1|2)', '', token) in a.SHORT_VOWELS:
 		return True
 	else: 
 		return False
 
 def has_same_double_consonant(word):
+	"""Tests whether a given word, not in Arpabet, has a double consonant 
+	that is the same letter, like 'suffering', or not."""
 	for i in range(len(word)):
 		if i < len(word) - 1 and word[i] in a.NORMAL_CONSONANTS and word[i] == word[i+1]:
 			return word[i]
 	return False
 
 def syllabifier(word):
-	#gets arpabet IPA transcription of the ipa_word
+	"""Converts a gievn word to Arpabet and splits it in syllables 
+	according to the rules given here: howmanysyllables.com/divideintosyllables.
+
+	It's still a work in progress."""
+	#gets arpabet IPA transcription of word
 	ipa_word = arpabet[word][0]
 	syllables = []
 	
 	for i, token in enumerate(ipa_word):
-		#seperating between double consonants (that are not consonant digraphs) like kit-ten or pil-grim
 		if 0 < i < len(ipa_word) - 1 and is_consonant(token) and is_vowel(ipa_word[i-1])  and (has_same_double_consonant(word) == token.lower() or is_consonant(ipa_word[i+1])):
 			if has_same_double_consonant(word) != False:
 				if not syllables:
@@ -95,16 +104,20 @@ def syllabifier(word):
 			del syllables[i]
 		if not syllable:
 			del syllables[i]		
-	#cleans up the thing
-	rev = syllables[::-1]
-	for i,syllable in enumerate(rev):
-		for j, token in enumerate(syllables):
-			if 0 < j < len(syllables) - 1 and syllable[len(token) - len(syllable):] == token:
-				if has_same_double_consonant(word) != False:
-					 = [:(len(token) - len(syllable)) + 1]
-				else:
-					 = [:len(rev[i+1]) - len(syllable)]
-
+		#removes redundant appending that happens with longer words like com-bination-nation-tion,
+		#does not work yet for some reason
+		if len(syllables) > 2:
+			rev = syllables[::-1]
+			for i,reviter in enumerate(rev):
+				print "syllable %s" %syllable
+				for j, token in enumerate(syllables):
+					print "token %s" %token
+					if 0 < j < len(syllables) - 1 and token[len(token) - len(reviter):] == reviter:
+						if has_same_double_consonant(word) != False:
+							reviter = token[:(len(reviter) - len(token)) + 1]
+						else:
+							print "foo"
+							reviter = token[:(len(reviter) - len(token)) + 1]
+							print "changed token %s" %reviter
+			return rev[::-1]
 	return syllables
-
-print syllabifier('combination')
