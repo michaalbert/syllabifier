@@ -109,15 +109,11 @@ def syllabifier(word):
 		if len(syllables) > 2:
 			rev = syllables[::-1]
 			for i,reviter in enumerate(rev):
-				print "syllable %s" %syllable
 				for j, token in enumerate(syllables):
-					print "token %s" %token
 					if 0 < j < len(syllables) - 1 and token[len(token) - len(reviter):] == reviter:
 						if has_same_double_consonant(word) != False:
 							reviter = token[:(len(reviter) - len(token)) + 1]
 						else:
-							print "foo"
 							reviter = token[:(len(reviter) - len(token)) + 1]
-							print "changed token %s" %reviter
 			return rev[::-1]
 	return syllables
