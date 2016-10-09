@@ -104,18 +104,12 @@ def syllabifier(word):
 			del syllables[i]
 		if not syllable:
 			del syllables[i]		
-	#removes redundant appending that happens with longer words like com-bination-nation-tion,
-	#does not work yet for some reason
-	if len(syllables) > 2:
-		rev = syllables[::-1]
-		for i,reviter in enumerate(rev):
-			for j, token in enumerate(syllables):
-				if 0 < j < len(syllables) - 1 and token[len(token) - len(reviter):] == reviter:
-					if has_same_double_consonant(word) != False:
-						reviter = token[:(len(reviter) - len(token)) + 1]
-					else:
-						reviter = token[:(len(reviter) - len(token)) + 1]
-	if not rev:
-		return syllables
-	else:
-		return rev[::-1]
+	#removes redundant appending that happens with longer words like com-bination-nation-tion
+	if len(syllables) >= 2:		
+		for i, syllable in enumerate(syllables):
+			if i < len(syllables) - 1 and syllable[len(syllable) - len(syllables[i+1]):] == syllables[i+1]:
+				if has_same_double_consonant(word) != False and has_same_double_consonant(word).upper() == syllables[i+1][0]:
+					syllables[i] = syllable[:(len(syllable) - len(syllables[i+1])) + 1]
+				else:
+					syllables[i] = syllable[:len(syllable) - len(syllables[i+1])]
+	return syllables		
